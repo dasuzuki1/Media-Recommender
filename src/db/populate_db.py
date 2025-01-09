@@ -1,6 +1,7 @@
 import sqlite3
 from src.api.fetch_data import fetch_anime_by_title, fetch_popular_anime, fetch_anime_with_favorites
 import time
+import json
 def populate_database():
     """
     Fetch popular anime and populate the database.
@@ -26,7 +27,7 @@ def populate_anime_with_favorites(min_favorites=50):
     cursor = conn.cursor()
 
     # Pagination variables
-    page = 166
+    page = 1
     per_page = 50
     total_fetched = 0
 
@@ -39,9 +40,15 @@ def populate_anime_with_favorites(min_favorites=50):
 
         # Insert fetched anime into the database
         for anime in anime_list:
+            relations = anime.get("relations", {}).get("edges", [])
+            relations_json = json.dumps([{
+                "relationType": edge.get("relationType", "UNKNOWN"),
+                "relatedAnimeId": edge.get("node", {}).get("id")
+            } for edge in relations])
+            print(relations_json)
             cursor.execute("""
-            INSERT OR IGNORE INTO Anime (anime_id, title_romaji, title_english, description, episodes, average_score, favourites, genres, relation_type)
-            VALUES (?, ?, ?, ?, ?, ?, ?,?)
+            INSERT OR IGNORE INTO Anime (anime_id, title_romaji, title_english, description, episodes, average_score, favourites, relations, genres)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 anime["id"],
                 anime.get("title", {}).get("romaji", "Unknown Title"),
@@ -50,8 +57,10 @@ def populate_anime_with_favorites(min_favorites=50):
                 anime.get("episodes", 0),
                 anime.get("averageScore", 0),
                 anime.get("favourites", 0),
+                relations_json,  # Ensure this is a string
                 ", ".join(anime.get("genres", []))
             ))
+
             total_fetched += 1
 
         # Commit after each page

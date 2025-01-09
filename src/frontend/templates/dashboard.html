@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+</head>
+<body>
+    <button id="fetchRecommendations">Get Recommendations</button>
+    <div id="recommendationsContainer">
+        <!-- Recommendations will be appended here -->
+    </div>
+
+    <script>
+        document.getElementById("fetchRecommendations").addEventListener("click", async () => {
+            try {
+                // Send request to the backend
+                const response = await fetch("/run_recommender", { method: "POST" });
+                const data = await response.json();
+    
+                // Clear existing recommendations
+                const container = document.getElementById("recommendationsContainer");
+                container.innerHTML = "";
+    
+                if (data.recommendations && data.recommendations.length > 0) {
+                    // Create a list of recommendations
+                    const list = document.createElement("ul");
+    
+                    data.recommendations.forEach((recommendation) => {
+                        const item = document.createElement("li");
+                        item.textContent = `${recommendation.title_romaji} - Score: ${recommendation.similarity_score.toFixed(2)}`;
+                        list.appendChild(item);
+                    });
+    
+                    container.appendChild(list);
+                } else {
+                    container.textContent = "No recommendations available.";
+                }
+            } catch (error) {
+                console.error("Error fetching recommendations:", error);
+                alert("Failed to fetch recommendations. Please try again.");
+            }
+        });
+    </script>
+    
+</body>
+
+<h1>Welcome!</h1>
+<button onclick="fetchAnimeList()">Fetch Anime List</button>
+<script>
+async function fetchAnimeList() {
+    const response = await fetch('/fetch_anime_list', { method: 'POST' });
+    const data = await response.json();
+    alert(data.message || data.error);
+}
+</script>
+
+<h1>Welcome!</h1>
+<button onclick="login()">Login</button>
+<script>
+function login() {
+    // Redirect the user to the login endpoint
+    window.location.href = '/login';
+}
+</script>
+
+
+</html>
