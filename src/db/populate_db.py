@@ -27,7 +27,7 @@ def populate_anime_with_favorites(min_favorites=50):
     cursor = conn.cursor()
 
     # Pagination variables
-    page = 1
+    page = 206
     per_page = 50
     total_fetched = 0
 
@@ -45,7 +45,7 @@ def populate_anime_with_favorites(min_favorites=50):
                 "relationType": edge.get("relationType", "UNKNOWN"),
                 "relatedAnimeId": edge.get("node", {}).get("id")
             } for edge in relations])
-            print(relations_json)
+           # print(relations_json)
             cursor.execute("""
             INSERT OR IGNORE INTO Anime (anime_id, title_romaji, title_english, description, episodes, average_score, favourites, relations, genres)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)

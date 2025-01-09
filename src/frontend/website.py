@@ -4,6 +4,7 @@ import pip._vendor.requests as requests
 import sqlite3
 import secrets
 import os
+import json
 import pandas as pd
 from sklearn.preprocessing import MultiLabelBinarizer,MinMaxScaler
 from sklearn.metrics.pairwise import cosine_similarity
@@ -235,7 +236,7 @@ def recommender():
     """
     anime_df = pd.read_sql_query(anime_query, conn)
     user_query = """
-    SELECT anime_id, rating, favourites, relations
+    SELECT anime_id, rating, favourites
     FROM UserAnime
     WHERE user_id = ? AND (rating IS NOT NULL OR favourites > 0);
     """
@@ -328,7 +329,8 @@ def recommender():
     # Exclude user’s already watched anime
     recommendations_df = anime_df[~anime_df['anime_id'].isin(user_df['anime_id'])]
     recommendations_df = recommendations_df[anime_df['episodes'] > 7]
-    recommendations_df = recommendations_df[anime_df['']]
+    recommendations_df = recommendations_df[~recommendations_df['relations'].str.contains('"relationType": "SEQUEL"', na=False)]
+
     
     recommendations_df = recommendations_df.sort_values(by='similarity_score', ascending=False)
 
