@@ -19,7 +19,6 @@ def populate_database():
     conn.close()
     print("Database populated with popular anime!")
 
-import sqlite3
 
 def populate_anime_with_favorites(min_favorites=50):
     # Connect to the database
@@ -27,7 +26,7 @@ def populate_anime_with_favorites(min_favorites=50):
     cursor = conn.cursor()
 
     # Pagination variables
-    page = 1
+    page = 166
     per_page = 50
     total_fetched = 0
 
@@ -41,8 +40,8 @@ def populate_anime_with_favorites(min_favorites=50):
         # Insert fetched anime into the database
         for anime in anime_list:
             cursor.execute("""
-            INSERT OR IGNORE INTO Anime (anime_id, title_romaji, title_english, description, episodes, average_score, genres)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            INSERT OR IGNORE INTO Anime (anime_id, title_romaji, title_english, description, episodes, average_score, favourites, genres, relation_type)
+            VALUES (?, ?, ?, ?, ?, ?, ?,?)
             """, (
                 anime["id"],
                 anime.get("title", {}).get("romaji", "Unknown Title"),
@@ -50,6 +49,7 @@ def populate_anime_with_favorites(min_favorites=50):
                 anime.get("description", "No description available."),
                 anime.get("episodes", 0),
                 anime.get("averageScore", 0),
+                anime.get("favourites", 0),
                 ", ".join(anime.get("genres", []))
             ))
             total_fetched += 1
@@ -115,14 +115,15 @@ def initialize_useranime_database():
 
     # Create UserAnime table
     cursor.execute("""
-    CREATE TABLE IF NOT EXISTS UserAnime_new (
+    CREATE TABLE IF NOT EXISTS UserAnime (
         user_anime_id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id INTEGER,
         anime_id INTEGER REFERENCES Anime(anime_id),
         rating FLOAT,
-        favorite BOOLEAN,
+        favourites BOOLEAN,
         status VARCHAR(20),
-        last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(user_id, anime_id)
     );
     """)
 
