@@ -1,13 +1,15 @@
 import pip._vendor.requests as requests
+import os
+from dotenv import load_dotenv
 
 def get_access_token(auth_code):
     url = "https://anilist.co/api/v2/oauth/token"
-    
+    load_dotenv()
     payload = {
         "grant_type": "authorization_code",
-        "client_id": "23514",
-        "client_secret": "41fhhdu46KlSKUpLMtrwejsvQMh1fOC60oVzMlBS",
-        "redirect_uri": "http://localhost:8000/callback",
+        "client_id": os.getenv("CLIENT_ID"),
+        "client_secret": os.getenv("CLIENT_SECRET"),
+        "redirect_uri": os.getenv("REDIRECT_URI"),
         "code": auth_code
     }
     

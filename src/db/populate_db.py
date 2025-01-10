@@ -27,7 +27,7 @@ def populate_anime_with_favorites(min_favorites=50):
     cursor = conn.cursor()
 
     # Pagination variables
-    page = 206
+    page = 1
     per_page = 50
     total_fetched = 0
 

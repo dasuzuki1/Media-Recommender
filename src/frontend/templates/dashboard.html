@@ -1,11 +1,32 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark:bg-slate-800">
 <head>
+    <link href="../static/css/styles.css" rel="stylesheet">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
 </head>
+<div class="bg-white dark:bg-slate-800 rounded-lg px-6 py-8 ring-1 ring-slate-900/5 shadow-xl">
+<button onclick="login()">Login</button>
+<script>
+function login() {
+    // Redirect the user to the login endpoint
+    window.location.href = '/login';
+}
+</script>
+  </div>
+
+  
 <body>
+    <h1 class="text-blue-500 text-3xl">Hello, Tailwind!</h1>
+    <header class="bg-blue-500 text-white p-4">
+        <h1 class="text-blue-500 text-3xl">Hello, Tailwind!</h1>
+    
+        <h1 class="text-2xl font-bold">Welcome to Your Dashboard</h1>
+    </header>
+    <h1 class="text-blue-500 text-3xl">This should now be blue and extra large!</h1>
+
+    
     <button id="fetchRecommendations">Get Recommendations</button>
     <div id="recommendationsContainer">
         <!-- Recommendations will be appended here -->
@@ -55,14 +76,7 @@ async function fetchAnimeList() {
 }
 </script>
 
-<h1>Welcome!</h1>
-<button onclick="login()">Login</button>
-<script>
-function login() {
-    // Redirect the user to the login endpoint
-    window.location.href = '/login';
-}
-</script>
+
 
 
 </html>

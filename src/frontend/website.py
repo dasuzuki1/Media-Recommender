@@ -8,17 +8,21 @@ import json
 import pandas as pd
 from sklearn.preprocessing import MultiLabelBinarizer,MinMaxScaler
 from sklearn.metrics.pairwise import cosine_similarity
+from dotenv import load_dotenv
+import os
 
 app = Flask(__name__)
 app.secret_key = secrets.token_hex(24)  # Required for session management
 initialize_useranime_database()
 
-
-CLIENT_ID = "23514"
-CLIENT_SECRET = "41fhhdu46KlSKUpLMtrwejsvQMh1fOC60oVzMlBS"
-REDIRECT_URI = "http://localhost:8000/callback"
-API_HEADERS = {"Content-Type": "application/json", "Accept": "application/json"}
-
+load_dotenv()
+CLIENT_ID = os.getenv("CLIENT_ID")
+CLIENT_SECRET = os.getenv("CLIENT_SECRET")
+REDIRECT_URI = os.getenv("REDIRECT_URI")
+API_HEADERS = {
+    "Content-Type": os.getenv("CONTENT_TYPE"),
+    "Accept": os.getenv("ACCEPT")
+}
 
 def fetch_user_anime_list(access_token):
     url = "https://graphql.anilist.co"
@@ -103,9 +107,9 @@ def callback():
     token_url = "https://anilist.co/api/v2/oauth/token"
     payload = {
         "grant_type": "authorization_code",
-        "client_id": CLIENT_ID,
-        "client_secret": CLIENT_SECRET,
-        "redirect_uri": REDIRECT_URI,
+        "client_id": os.getenv("CLIENT_ID"),
+        "client_secret": os.getenv("CLIENT_SECRET"),
+        "redirect_uri": os.getenv("REDIRECT_URI"),
         "code": code
     }
     response = requests.post(token_url, json=payload, headers=API_HEADERS)
@@ -329,7 +333,7 @@ def recommender():
     # Exclude user’s already watched anime
     recommendations_df = anime_df[~anime_df['anime_id'].isin(user_df['anime_id'])]
     recommendations_df = recommendations_df[anime_df['episodes'] > 7]
-    recommendations_df = recommendations_df[~recommendations_df['relations'].str.contains('"relationType": "SEQUEL"', na=False)]
+    recommendations_df = recommendations_df[~recommendations_df['relations'].str.contains('"relationType": "PREQUEL"', na=False)]
 
     
     recommendations_df = recommendations_df.sort_values(by='similarity_score', ascending=False)
