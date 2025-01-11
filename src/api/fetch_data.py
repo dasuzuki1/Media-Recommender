@@ -16,6 +16,10 @@ def fetch_anime_with_favorites(min_favorites=50, page=1, per_page=50):
           episodes
           averageScore
           favourites
+          coverImage {
+            large
+            medium
+          }
           relations{
                 edges{
                     relationType

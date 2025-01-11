@@ -47,8 +47,20 @@ def populate_anime_with_favorites(min_favorites=50):
             } for edge in relations])
            # print(relations_json)
             cursor.execute("""
-            INSERT OR IGNORE INTO Anime (anime_id, title_romaji, title_english, description, episodes, average_score, favourites, relations, genres)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT OR IGNORE INTO Anime (anime_id, title_romaji, title_english, description, episodes, average_score, favourites, cover_image_large, cover_image_medium, url, relations, genres)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT(anime_id) DO UPDATE SET
+                title_romaji = excluded.title_romaji,
+                title_english = excluded.title_english,
+                description = excluded.description,
+                episodes = excluded.episodes,
+                average_score = excluded.average_score,
+                favourites = excluded.favourites,
+                cover_image_large = excluded.cover_image_large,
+                cover_image_medium = excluded.cover_image_medium,
+                url = excluded.url,
+                relations = excluded.relations,
+                genres = excluded.genres
             """, (
                 anime["id"],
                 anime.get("title", {}).get("romaji", "Unknown Title"),
@@ -57,6 +69,9 @@ def populate_anime_with_favorites(min_favorites=50):
                 anime.get("episodes", 0),
                 anime.get("averageScore", 0),
                 anime.get("favourites", 0),
+                anime.get("coverImage",{}).get("large", "No Image"),
+                anime.get("coverImage",{}).get("medium","No Image"),
+                f"https://anilist.co/anime/{anime['id']}",
                 relations_json,  # Ensure this is a string
                 ", ".join(anime.get("genres", []))
             ))

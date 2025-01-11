@@ -6,6 +6,9 @@ CREATE TABLE IF NOT EXISTS Anime (
     episodes INT,
     average_score FLOAT,
     favourites INT,
+    cover_image_large TEXT,                   -- URL for the large cover image
+    cover_image_medium TEXT,
+    url TEXT,
     relations TEXT,
     genres TEXT
 );
