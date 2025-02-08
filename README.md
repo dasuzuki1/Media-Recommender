@@ -13,8 +13,7 @@
         <h1>Media Recommendation System</h1>
 
 
-
-https://github.com/user-attachments/assets/8b420e6d-34c5-487b-a97d-90cbc6205bb6
+![Demo](https://github.com/user-attachments/assets/b16d7fc6-9d23-4bb1-8306-81bc440b510a)
         <nav>
             <a href="#home">Home</a>
             <a href="#features">Features</a>
