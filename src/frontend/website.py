@@ -234,7 +234,7 @@ def recommender():
         return redirect("/login")
 
     anime_query = """
-    SELECT anime_id, title_romaji, genres, average_score, favourites, episodes, relations
+    SELECT anime_id, title_romaji, genres, average_score, favourites, episodes, relations, cover_image_large
     FROM Anime
     WHERE average_score IS NOT NULL AND average_score > 0 AND favourites > 100;
     """
@@ -323,9 +323,6 @@ def recommender():
     print(user_genre_weights)
     print("Sum of user_genre_weights:", user_genre_weights.sum())
     
-
-
-
     # Compute similarity
     similarity_scores = cosine_similarity([user_vector], anime_vectors)[0]
     anime_df['similarity_score'] = similarity_scores
@@ -337,11 +334,10 @@ def recommender():
 
     
     recommendations_df = recommendations_df.sort_values(by='similarity_score', ascending=False)
-
+    recommendations_df.average_score *= 10
     top_n = 10
     print(recommendations_df[['anime_id', 'title_romaji']])
-    return recommendations_df[['anime_id', 'title_romaji', 'similarity_score', 'genres']].head(top_n)
-
+    return recommendations_df[['anime_id', 'title_romaji', 'similarity_score', 'genres', 'cover_image_large', 'average_score']].head(top_n)
 
 @app.route("/run_recommender", methods=["POST"])
 def run_recommender():
