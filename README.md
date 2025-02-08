@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+[Screen Recording 2025-02-07 at 10.01.09 PM.zip](https://github.com/user-attachments/files/18716634/Screen.Recording.2025-02-07.at.10.01.09.PM.zip)<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -11,6 +11,11 @@
 <body>
     <header>
         <h1>Media Recommendation System</h1>
+
+
+https://github.com/user-attachments/assets/94f57b3e-b7e1-4131-843b-046afd48a3d9
+
+
         <nav>
             <a href="#home">Home</a>
             <a href="#features">Features</a>
@@ -27,20 +32,16 @@
             <h2>Features</h2>
             <div class="card">
                 <h3>Personalized Recommendations</h3>
-                <p>Using advanced algorithms, we deliver tailored anime recommendations just for you.</p>
-            </div>
-            <div class="card">
-                <h3>User-Friendly Interface</h3>
-                <p>Navigate easily through your dashboard and explore recommendations with a clean UI.</p>
+                <p>Using advanced algorithms, delivers tailored anime recommendations just for you.</p>
             </div>
             <div class="card">
                 <h3>Data-Driven Insights</h3>
-                <p>Analyze user preferences and trends to discover what you love.</p>
+                <p>Analyze user preferences and trends to discover what user enjoys.</p>
             </div>
         </section>
         <section id="about" class="section">
             <h2>About</h2>
-            <p>This project integrates the AniList API and utilizes machine learning for recommendation generation. It’s built with Python, Flask, and modern web development practices.</p>
+            <p>This project integrates the AniList API and utilizes machine learning for recommendation generation. It’s built with Python, Flask, JavaScript, and HTML/CSS.</p>
         </section>
     </main>
     <footer>
