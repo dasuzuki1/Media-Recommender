@@ -1,4 +1,36 @@
-# dotenv environment variables file
+# Terraform state and cache
+.terraform/
+.terraform.lock.hcl.bak
+*.tfstate
+*.tfstate.*
+*.tfplan
+crash.log
+crash.*.log
+
+# Local backend config + variable files with secrets
+.envrc
+backend.hcl
+*.auto.tfvars
+*.auto.tfvars.json
+terraform.tfvars
+terraform.tfvars.json
+
+# Dotenv
 .env
-.env.test
+.env.*
+!.env.example
+
+# Local databases (never commit user data)
+*.db
+*.sqlite
+*.sqlite3
+
+# Lambda build artifacts
+build/
+__pycache__/
+*.pyc
+
+# OS / editor
 .DS_Store
+.idea/
+.vscode/

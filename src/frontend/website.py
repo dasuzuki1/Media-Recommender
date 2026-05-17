@@ -11,11 +11,13 @@ from sklearn.metrics.pairwise import cosine_similarity
 from dotenv import load_dotenv
 import os
 
+load_dotenv()
+
 app = Flask(__name__)
-app.secret_key = secrets.token_hex(24)  # Required for session management
+# Persist across restarts in deployed environments; fall back to ephemeral key locally.
+app.secret_key = os.getenv("FLASK_SECRET_KEY") or secrets.token_hex(24)
 initialize_useranime_database()
 
-load_dotenv()
 CLIENT_ID = os.getenv("CLIENT_ID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 REDIRECT_URI = os.getenv("REDIRECT_URI")
