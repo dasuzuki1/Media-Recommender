@@ -1,49 +1,39 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css"> <!-- Link to your CSS -->
-    <!-- Add external font -->
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    
-</head>
-<body>
-    <header>
-        <h1>Media Recommendation System</h1>
+# Media Recommender
+
+Personalized anime recommendations driven by your [AniList](https://anilist.co) watch history. Implemented in two iterations:
+
+- **v1 — Flask MVP** (`src/`) — server-rendered Flask app with SQLite, on-demand recommender, AniList OAuth.
+- **v2 — Serverless on AWS** (`aws/`) — same product, redesigned as Lambda + DynamoDB + EventBridge + API Gateway + CloudFront.
 
 
 ![Demo](https://github.com/user-attachments/assets/b16d7fc6-9d23-4bb1-8306-81bc440b510a)
-        <nav>
-            <a href="#home">Home</a>
-            <a href="#features">Features</a>
-            <a href="#about">About</a>
-        </nav>
-    </header>
-    <main>
-        <section id="home" class="section">
-            <h2>Welcome to Media Recommendation System</h2>
-            <p>Discover personalized anime recommendations based on your preferences. Login to get started.</p>
-            <button class="button">Login with AniList</button>
-        </section>
-        <section id="features" class="section">
-            <h2>Features</h2>
-            <div class="card">
-                <h3>Personalized Recommendations</h3>
-                <p>Using advanced algorithms, delivers tailored anime recommendations just for you.</p>
-            </div>
-            <div class="card">
-                <h3>Data-Driven Insights</h3>
-                <p>Analyze user preferences and trends to discover what user enjoys.</p>
-            </div>
-        </section>
-        <section id="about" class="section">
-            <h2>About</h2>
-            <p>This project integrates the AniList API and utilizes machine learning for recommendation generation. It’s built with Python, Flask, JavaScript, and HTML/CSS.</p>
-        </section>
-    </main>
-    <footer>
-        <p>&copy; 2025 Media Recommendation System. All rights reserved.</p>
-    </footer>
-</body>
-</html>
+
+## Stack
+
+`Python` · `SQL` · `Flask` · `JavaScript` · `Terraform` · `AWS (Lambda, DynamoDB, API Gateway, EventBridge, SNS, S3, CloudFront)` · `scikit-learn` / `numpy`
+
+## Architecture
+
+### v2 (current)
+
+```
+Browser ──► CloudFront ──► S3 (static SPA)
+   │
+   └──► API Gateway ──► API Lambda ──► DynamoDB (Users, UserAnime, Recommendations)
+                              │
+                              └──► AniList GraphQL (OAuth + list sync)
+
+EventBridge (hourly) ──► Compute Lambda ──► reads Anime + UserAnime
+                                         └─► writes Recommendations
+```
+
+The compute Lambda runs a **hybrid recommender**:
+- **Content-based** — genre one-hot vectors, cosine similarity to the user's rating-weighted preference vector.
+- **Item-item collaborative** — co-occurrence among users who liked the same anime, normalized by item popularity.
+- Final score: `content_weight * content + (1 - content_weight) * collaborative` (default 0.6 / 0.4).
+
+The API Lambda only does a single DynamoDB `Query` per recommendation request — typical p50 latency under 100 ms.
+
+### v1 (legacy, kept for reference)
+
+Single Flask process, SQLite for both catalog and user data, recommender runs synchronously in the request handler. Lives in `src/`. Run with `python -m src.frontend.website`.

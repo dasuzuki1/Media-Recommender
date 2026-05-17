@@ -1,6 +1,73 @@
 import pip._vendor.requests as requests
 
 API_URL = "https://graphql.anilist.co"
+USER_AGENT = "Media-Recommender/1.0 (+https://github.com/dasuzuki1/Media-Recommender)"
+
+
+def fetch_user_lists_by_username(username, media_type="ANIME"):
+    """Fetch any AniList user's public list by username (no auth required).
+
+    media_type: "ANIME" or "MANGA".
+    Returns (viewer_dict, list_of_entries) where each entry has the shape
+    {"score", "status", "media": {...}}. Empty list if the user is private
+    or not found.
+    """
+    query = """
+    query ($name: String, $type: MediaType) {
+      MediaListCollection(userName: $name, type: $type) {
+        user {
+          id
+          name
+          avatar { large }
+        }
+        lists {
+          name
+          entries {
+            score
+            status
+            media {
+              id
+              title { romaji english }
+              description
+              genres
+              episodes
+              averageScore
+              favourites
+              coverImage { large medium }
+              isFavourite
+            }
+          }
+        }
+      }
+    }
+    """
+    variables = {"name": username, "type": media_type}
+    response = requests.post(
+        API_URL,
+        json={"query": query, "variables": variables},
+        headers={"User-Agent": USER_AGENT, "Accept": "application/json"},
+    )
+
+    if response.status_code != 200:
+        print(f"AniList HTTP {response.status_code}: {response.text}")
+        return None, []
+
+    data = response.json()
+    if "errors" in data:
+        print(f"AniList GraphQL error: {data['errors']}")
+        return None, []
+
+    collection = data.get("data", {}).get("MediaListCollection")
+    if not collection:
+        return None, []
+
+    viewer = collection.get("user")
+    entries = []
+    for lst in collection.get("lists", []):
+        for entry in lst.get("entries", []):
+            entries.append(entry)
+    return viewer, entries
+
 
 def fetch_anime_with_favorites(min_favorites=50, page=1, per_page=50):
     query = """
