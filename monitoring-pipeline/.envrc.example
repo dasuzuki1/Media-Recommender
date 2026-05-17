@@ -1,0 +1,24 @@
+# Copy to .envrc (gitignored) and fill in real values.
+# With direnv: `direnv allow` auto-loads when you cd in.
+# Without direnv: `source .envrc` manually.
+
+# --- AWS auth ---
+export AWS_PROFILE="monitoring"
+export AWS_REGION="us-east-1"
+
+# --- Terraform variables ---
+# TF_VAR_<name> auto-populates variable "<name>" in variables.tf
+export TF_VAR_aws_region="us-east-1"
+export TF_VAR_environment="dev"
+export TF_VAR_alert_email="you@example.com"
+export TF_VAR_monitor_targets='["https://example.com/health"]'
+# Optional overrides:
+# export TF_VAR_schedule_expression="rate(1 minute)"
+# export TF_VAR_lambda_memory_mb="256"
+
+# --- Remote state backend (bootstrap these out-of-band) ---
+export TF_STATE_BUCKET="your-tf-state-bucket"
+export TF_STATE_LOCK_TABLE="terraform-locks"
+
+# Inject backend values into `terraform init` automatically
+export TF_CLI_ARGS_init="-backend-config=bucket=${TF_STATE_BUCKET} -backend-config=dynamodb_table=${TF_STATE_LOCK_TABLE} -backend-config=region=${AWS_REGION}"

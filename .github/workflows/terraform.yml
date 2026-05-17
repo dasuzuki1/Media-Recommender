@@ -1,0 +1,137 @@
+name: Terraform
+
+# Manual-only: trigger via Actions tab > "Terraform" > "Run workflow".
+# To restore auto-runs on PRs / pushes to main, add `pull_request:` and `push:`
+# blocks here (see git history for the previous config).
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write       # OIDC to assume AWS role
+  contents: read
+  pull-requests: write  # for posting plan output on PRs
+
+env:
+  TF_VERSION: '1.9.8'
+  TF_IN_AUTOMATION: 'true'
+  TF_INPUT: '0'
+  # All TF_VAR_* values come from GitHub Actions repo/environment variables.
+  # Set these under Settings > Secrets and variables > Actions > Variables:
+  #   AWS_REGION, ENVIRONMENT, ALERT_EMAIL, MONITOR_TARGETS,
+  #   TF_STATE_BUCKET, TF_STATE_LOCK_TABLE
+  # And under Secrets:
+  #   AWS_DEPLOY_ROLE_ARN  (IAM role with OIDC trust to this repo)
+  AWS_REGION: ${{ vars.AWS_REGION }}
+  TF_VAR_aws_region: ${{ vars.AWS_REGION }}
+  TF_VAR_environment: ${{ vars.ENVIRONMENT }}
+  TF_VAR_alert_email: ${{ vars.ALERT_EMAIL }}
+  TF_VAR_monitor_targets: ${{ vars.MONITOR_TARGETS }}
+
+defaults:
+  run:
+    working-directory: monitoring-pipeline
+    shell: bash
+
+jobs:
+  fmt:
+    name: fmt
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+      - run: terraform fmt -check -recursive
+
+  validate:
+    name: validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+      - run: terraform init -backend=false
+      - run: terraform validate
+
+  tflint:
+    name: tflint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: terraform-linters/setup-tflint@v4
+        with:
+          tflint_version: latest
+      - run: tflint --init
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - run: tflint --format=compact
+
+  security:
+    name: checkov
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: bridgecrewio/checkov-action@master
+        with:
+          directory: monitoring-pipeline
+          framework: terraform
+          quiet: true
+
+  plan:
+    name: plan
+    runs-on: ubuntu-latest
+    needs: [fmt, validate, tflint, security]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+      - name: terraform init
+        run: |
+          terraform init \
+            -backend-config="bucket=${{ vars.TF_STATE_BUCKET }}" \
+            -backend-config="dynamodb_table=${{ vars.TF_STATE_LOCK_TABLE }}" \
+            -backend-config="region=${{ vars.AWS_REGION }}"
+      - name: terraform plan
+        run: terraform plan -no-color -out=tfplan
+      - name: upload plan artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tfplan
+          path: monitoring-pipeline/tfplan
+          retention-days: 7
+
+  # ---------------------------------------------------------------------------
+  # Uncomment to enable automated deploys on push to main.
+  # Requires:
+  #   - GitHub Environment named "production" with required-reviewers protection
+  #   - AWS_DEPLOY_ROLE_ARN secret pointing to an IAM role trusted via OIDC
+  # ---------------------------------------------------------------------------
+  # apply:
+  #   name: apply
+  #   runs-on: ubuntu-latest
+  #   needs: [plan]
+  #   if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+  #   environment: production
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: aws-actions/configure-aws-credentials@v4
+  #       with:
+  #         role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+  #         aws-region: ${{ vars.AWS_REGION }}
+  #     - uses: hashicorp/setup-terraform@v3
+  #       with:
+  #         terraform_version: ${{ env.TF_VERSION }}
+  #     - name: terraform init
+  #       run: |
+  #         terraform init \
+  #           -backend-config="bucket=${{ vars.TF_STATE_BUCKET }}" \
+  #           -backend-config="dynamodb_table=${{ vars.TF_STATE_LOCK_TABLE }}" \
+  #           -backend-config="region=${{ vars.AWS_REGION }}"
+  #     - name: terraform apply
+  #       run: terraform apply -auto-approve -input=false
