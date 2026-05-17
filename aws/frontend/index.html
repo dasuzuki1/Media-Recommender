@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Media Recommender</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header class="header">
+    <h1>Media Recommender</h1>
+    <div id="user-info" class="user-info hidden">
+      <img id="user-avatar" alt="">
+      <span id="user-name"></span>
+      <button id="sync-btn" class="btn btn-secondary">Sync my list</button>
+    </div>
+    <button id="login-btn" class="btn">Log in with AniList</button>
+  </header>
+
+  <main class="container">
+    <section id="welcome" class="section">
+      <h2>Personalized anime recommendations</h2>
+      <p>
+        Log in with AniList. The backend syncs your watch history into DynamoDB,
+        and an hourly Lambda recomputes recommendations using a hybrid of
+        content-based (genre cosine similarity) and item-item collaborative filtering.
+        Reads are served straight from a precomputed table — sub-100 ms per query.
+      </p>
+    </section>
+
+    <section id="status" class="status hidden"></section>
+
+    <section id="recommendations" class="recommendations"></section>
+  </main>
+
+  <footer class="footer">
+    <p>v2 — Serverless on AWS (Lambda · API Gateway · DynamoDB · EventBridge · CloudFront).
+       v1 Flask MVP lives at <code>src/frontend/website.py</code>.</p>
+  </footer>
+
+  <script src="api.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

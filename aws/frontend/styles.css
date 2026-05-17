@@ -1,0 +1,135 @@
+* { box-sizing: border-box; }
+
+body {
+  font-family: "Inter", system-ui, sans-serif;
+  margin: 0;
+  background: #f4f4f9;
+  color: #1f2937;
+}
+
+.hidden { display: none !important; }
+
+.header {
+  background: #4a90e2;
+  color: white;
+  padding: 24px 32px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-bottom: 3px solid #357ab8;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  flex: 1;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-info img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.btn {
+  background: white;
+  color: #4a90e2;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.btn:hover { transform: translateY(-1px); }
+.btn:disabled { opacity: 0.5; cursor: wait; }
+
+.btn-secondary {
+  background: #357ab8;
+  color: white;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px;
+}
+
+.section h2 { margin-top: 0; }
+
+.status {
+  background: #fff7d6;
+  border: 1px solid #f4d35e;
+  padding: 12px 16px;
+  border-radius: 6px;
+  margin: 16px 0;
+}
+
+.recommendations {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.recommendation-item {
+  background: white;
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  gap: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  transition: transform 0.15s ease;
+}
+
+.recommendation-item:hover { transform: translateY(-2px); }
+
+.recommendation-item img {
+  width: 80px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.recommendation-body h3 {
+  margin: 0 0 4px 0;
+  font-size: 16px;
+}
+
+.genres {
+  font-size: 13px;
+  color: #6b7280;
+  margin: 4px 0;
+}
+
+.score {
+  font-size: 13px;
+  margin: 4px 0 0 0;
+}
+
+.breakdown {
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.footer {
+  text-align: center;
+  padding: 24px;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.footer code {
+  background: #e5e7eb;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 12px;
+}
