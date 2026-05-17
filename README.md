@@ -2,7 +2,7 @@
 
 Personalized anime recommendations driven by your [AniList](https://anilist.co) watch history. Implemented in two iterations:
 
-- **v1 — Flask MVP** (`src/`) — server-rendered Flask app with SQLite, on-demand recommender, AniList OAuth.
+- **v1 — Flask Version** (`src/`) — server-rendered Flask app with SQLite, on-demand recommender, AniList OAuth.
 - **v2 — Serverless on AWS** (`aws/`) — same product, redesigned as Lambda + DynamoDB + EventBridge + API Gateway + CloudFront.
 
 
